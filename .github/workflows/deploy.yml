@@ -39,7 +39,9 @@ jobs:
       with:
         context: .
         push: true
-        tags: docker.io/${{ secrets.DOCKERHUB_USERNAME }}/ai-prediction-api:latest  deploy-to-ec2:
+        tags: docker.io/${{ secrets.DOCKERHUB_USERNAME }}/ai-prediction-api:latest
+
+  deploy-to-ec2:
     needs: build-and-push
     runs-on: ubuntu-latest
 
