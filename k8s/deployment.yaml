@@ -1,0 +1,24 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ai-prediction-api
+  labels:
+    app: ai-prediction-api
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: ai-prediction-api
+  template:
+    metadata:
+      labels:
+        app: ai-prediction-api
+    spec:
+      containers:
+      - name: ai-prediction-api
+        image: your-dockerhub-username/ai-prediction-api:latest
+        ports:
+        - containerPort: 8000
+        env:
+        - name: API_KEY
+          value: "supersecretapikey123"
