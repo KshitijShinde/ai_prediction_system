@@ -46,14 +46,29 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Deploy to AWS EC2
-      uses: appleboy/ssh-action@v0.1.6
+    - uses: actions/checkout@v3
+
+    - name: Copy Compose and Monitoring config to EC2
+      uses: appleboy/scp-action@main
       with:
         host: ${{ secrets.EC2_HOST }}
         username: ${{ secrets.EC2_USERNAME }}
         key: ${{ secrets.EC2_PRIVATE_KEY }}
+        source: "docker-compose.yml,monitoring/"
+        target: "~/"
+
+    - name: Deploy Stack to AWS EC2
+      uses: appleboy/ssh-action@v0.1.6
+      env:
+        API_IMAGE: docker.io/${{ secrets.DOCKERHUB_USERNAME }}/ai-prediction-api:latest
+      with:
+        host: ${{ secrets.EC2_HOST }}
+        username: ${{ secrets.EC2_USERNAME }}
+        key: ${{ secrets.EC2_PRIVATE_KEY }}
+        envs: API_IMAGE
         script: |
-          docker pull docker.io/${{ secrets.DOCKERHUB_USERNAME }}/ai-prediction-api:latest
           docker stop ai-api || true
           docker rm ai-api || true
-          docker run -d --name ai-api -p 80:8000 docker.io/${{ secrets.DOCKERHUB_USERNAME }}/ai-prediction-api:latest
+          export API_IMAGE=$API_IMAGE
+          docker compose pull
+          docker compose up -d

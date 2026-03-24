@@ -2,9 +2,10 @@ version: '3.8'
 
 services:
   api:
+    image: ${API_IMAGE:-ai-prediction-api:latest}
     build: .
     ports:
-      - "8002:8000"
+      - "80:8000"
     environment:
       - API_KEY=supersecretapikey123
 
