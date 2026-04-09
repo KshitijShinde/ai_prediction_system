@@ -48,39 +48,27 @@ jobs:
     steps:
     - uses: actions/checkout@v3
 
-    - name: Copy Manifests to EC2
+    - name: Copy Compose and Monitoring config to EC2
       uses: appleboy/scp-action@master
       with:
         host: ${{ secrets.EC2_HOST }}
         username: ${{ secrets.EC2_USERNAME }}
         key: ${{ secrets.EC2_PRIVATE_KEY }}
-        source: "k8s/"
+        source: "docker-compose.yml,monitoring/"
         target: "~/"
 
-    - name: Deploy to Kubernetes on EC2
+    - name: Deploy Stack to AWS EC2
       uses: appleboy/ssh-action@v0.1.6
       env:
-        DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
-        API_KEY: ${{ secrets.API_KEY }}
+        API_IMAGE: docker.io/${{ secrets.DOCKERHUB_USERNAME }}/ai-prediction-api:latest
       with:
         host: ${{ secrets.EC2_HOST }}
         username: ${{ secrets.EC2_USERNAME }}
         key: ${{ secrets.EC2_PRIVATE_KEY }}
-        envs: DOCKERHUB_USERNAME,API_KEY
+        envs: API_IMAGE
         script: |
-          set -e
-          export KUBECONFIG=/etc/rancher/k3s/k3s.yaml
-          
-          # Wait for K3s to be ready (prevents TLS handshake timeouts)
-          echo "Waiting for Kubernetes to be ready..."
-          timeout 180s bash -c 'until sudo k3s kubectl get nodes | grep -q "Ready"; do sleep 5; done'
-          
-          # Create secret if not exists
-          sudo k3s kubectl create secret generic ai-api-secrets --from-literal=api-key=$API_KEY --dry-run=client -o yaml | sudo k3s kubectl apply -f -
-          
-          # Replace placeholder and apply
-          sed -i "s/DOCKERHUB_USERNAME/$DOCKERHUB_USERNAME/g" ~/k8s/deployment.yaml
-          
-          sudo k3s kubectl apply -f ~/k8s/deployment.yaml
-          sudo k3s kubectl apply -f ~/k8s/service.yaml
-          sudo k3s kubectl apply -f ~/k8s/k8s-monitoring.yaml
+          docker stop ai-api || true
+          docker rm ai-api || true
+          export API_IMAGE=$API_IMAGE
+          docker compose pull
+          docker compose up -d
