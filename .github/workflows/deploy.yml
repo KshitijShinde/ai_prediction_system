@@ -71,6 +71,10 @@ jobs:
           set -e
           export KUBECONFIG=/etc/rancher/k3s/k3s.yaml
           
+          # Wait for K3s to be ready (prevents TLS handshake timeouts)
+          echo "Waiting for Kubernetes to be ready..."
+          timeout 180s bash -c 'until sudo k3s kubectl get nodes | grep -q "Ready"; do sleep 5; done'
+          
           # Create secret if not exists
           sudo k3s kubectl create secret generic ai-api-secrets --from-literal=api-key=$API_KEY --dry-run=client -o yaml | sudo k3s kubectl apply -f -
           
