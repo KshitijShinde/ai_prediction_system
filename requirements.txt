@@ -6,3 +6,4 @@ pandas
 joblib
 prometheus-client
 python-multipart
+prometheus-fastapi-instrumentator

@@ -48,27 +48,32 @@ jobs:
     steps:
     - uses: actions/checkout@v3
 
-    - name: Copy Compose and Monitoring config to EC2
+    - name: Copy Manifests to EC2
       uses: appleboy/scp-action@master
       with:
         host: ${{ secrets.EC2_HOST }}
         username: ${{ secrets.EC2_USERNAME }}
         key: ${{ secrets.EC2_PRIVATE_KEY }}
-        source: "docker-compose.yml,monitoring/"
+        source: "k8s/"
         target: "~/"
 
-    - name: Deploy Stack to AWS EC2
+    - name: Deploy to Kubernetes on EC2
       uses: appleboy/ssh-action@v0.1.6
       env:
-        API_IMAGE: docker.io/${{ secrets.DOCKERHUB_USERNAME }}/ai-prediction-api:latest
+        DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
+        API_KEY: ${{ secrets.API_KEY }}
       with:
         host: ${{ secrets.EC2_HOST }}
         username: ${{ secrets.EC2_USERNAME }}
         key: ${{ secrets.EC2_PRIVATE_KEY }}
-        envs: API_IMAGE
+        envs: DOCKERHUB_USERNAME,API_KEY
         script: |
-          docker stop ai-api || true
-          docker rm ai-api || true
-          export API_IMAGE=$API_IMAGE
-          docker compose pull
-          docker compose up -d
+          # Create secret if not exists
+          kubectl create secret generic ai-api-secrets --from-literal=api-key=$API_KEY --dry-run=client -o yaml | kubectl apply -f -
+          
+          # Replace placeholder and apply
+          sed -i "s/DOCKERHUB_USERNAME/$DOCKERHUB_USERNAME/g" ~/k8s/deployment.yaml
+          
+          kubectl apply -f ~/k8s/deployment.yaml
+          kubectl apply -f ~/k8s/service.yaml
+          kubectl apply -f ~/k8s/k8s-monitoring.yaml

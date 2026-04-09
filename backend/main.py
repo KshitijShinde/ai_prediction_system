@@ -3,7 +3,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import HTMLResponse
-from prometheus_client import make_asgi_app
+from prometheus_fastapi_instrumentator import Instrumentator
 
 from backend.api.predict import router as predict_router
 from backend.core.exceptions import global_exception_handler
@@ -24,8 +24,7 @@ app.add_middleware(
 )
 
 # Prometheus metrics
-metrics_app = make_asgi_app()
-app.mount("/metrics", metrics_app)
+Instrumentator().instrument(app).reveal_metrics().expose(app)
 
 # Include Routers
 app.include_router(predict_router, prefix="/api")

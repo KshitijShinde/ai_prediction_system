@@ -16,9 +16,12 @@ spec:
     spec:
       containers:
       - name: ai-prediction-api
-        image: your-dockerhub-username/ai-prediction-api:latest
+        image: DOCKERHUB_USERNAME/ai-prediction-api:latest
         ports:
         - containerPort: 8000
         env:
         - name: API_KEY
-          value: "supersecretapikey123"
+          valueFrom:
+            secretKeyRef:
+              name: ai-api-secrets
+              key: api-key
