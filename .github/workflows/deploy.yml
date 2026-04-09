@@ -68,12 +68,15 @@ jobs:
         key: ${{ secrets.EC2_PRIVATE_KEY }}
         envs: DOCKERHUB_USERNAME,API_KEY
         script: |
+          set -e
+          export KUBECONFIG=/etc/rancher/k3s/k3s.yaml
+          
           # Create secret if not exists
-          kubectl create secret generic ai-api-secrets --from-literal=api-key=$API_KEY --dry-run=client -o yaml | kubectl apply -f -
+          sudo k3s kubectl create secret generic ai-api-secrets --from-literal=api-key=$API_KEY --dry-run=client -o yaml | sudo k3s kubectl apply -f -
           
           # Replace placeholder and apply
           sed -i "s/DOCKERHUB_USERNAME/$DOCKERHUB_USERNAME/g" ~/k8s/deployment.yaml
           
-          kubectl apply -f ~/k8s/deployment.yaml
-          kubectl apply -f ~/k8s/service.yaml
-          kubectl apply -f ~/k8s/k8s-monitoring.yaml
+          sudo k3s kubectl apply -f ~/k8s/deployment.yaml
+          sudo k3s kubectl apply -f ~/k8s/service.yaml
+          sudo k3s kubectl apply -f ~/k8s/k8s-monitoring.yaml
