@@ -1,8 +1,9 @@
 import os
-from fastapi import FastAPI, Response
+from fastapi import FastAPI, Request, Response
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import HTMLResponse
+from starlette.middleware.base import BaseHTTPMiddleware
 from prometheus_fastapi_instrumentator import Instrumentator
 from prometheus_client import generate_latest, CONTENT_TYPE_LATEST
 
@@ -11,6 +12,20 @@ from backend.core.exceptions import global_exception_handler
 from backend.core.logging import logger
 
 app = FastAPI(title="AI Prediction API", version="1.0.0")
+
+# Middleware to prevent browser caching of frontend files
+class NoCacheMiddleware(BaseHTTPMiddleware):
+    async def dispatch(self, request: Request, call_next):
+        response = await call_next(request)
+        # Disable caching for HTML, JS, and CSS files
+        content_type = response.headers.get("content-type", "")
+        if any(ct in content_type for ct in ["text/html", "javascript", "text/css"]):
+            response.headers["Cache-Control"] = "no-cache, no-store, must-revalidate"
+            response.headers["Pragma"] = "no-cache"
+            response.headers["Expires"] = "0"
+        return response
+
+app.add_middleware(NoCacheMiddleware)
 
 # Exception handler
 app.add_exception_handler(Exception, global_exception_handler)
