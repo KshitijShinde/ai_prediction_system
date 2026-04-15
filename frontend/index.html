@@ -7,81 +7,9 @@
     <meta name="description" content="A comprehensive end-to-end Machine Learning web application with real-time predictions.">
     <!-- Modern Typography -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="css/style.css?v=2">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-</head>
-<body>
-    <div class="background-gradients">
-        <div class="blob blob1"></div>
-        <div class="blob blob2"></div>
-    </div>
-    <div class="container">
-        <header>
-            <h1>AI Prediction System</h1>
-            <p>Real-time machine learning predictions powered by FastAPI</p>
-        </header>
-
-        <main class="dashboard">
-            <section class="card form-section glass-panel">
-                <h2>Predict Iris Species</h2>
-                <form id="predictionForm">
-                    <div class="input-group">
-                        <label for="sepalLength">Sepal Length (cm)</label>
-                        <input type="number" id="sepalLength" step="0.1" min="0.1" value="5.1" required>
-                    </div>
-                    <div class="input-group">
-                        <label for="sepalWidth">Sepal Width (cm)</label>
-                        <input type="number" id="sepalWidth" step="0.1" min="0" value="3.5" required>
-                    </div>
-                    <div class="input-group">
-                        <label for="petalLength">Petal Length (cm)</label>
-                        <input type="number" id="petalLength" step="0.1" min="0.1" value="1.4" required>
-                    </div>
-                    <div class="input-group">
-                        <label for="petalWidth">Petal Width (cm)</label>
-                        <input type="number" id="petalWidth" step="0.1" min="0" value="0.2" required>
-                    </div>
-                    
-                    <div class="input-group">
-                        <label for="apiKey">API Key</label>
-                        <input type="password" id="apiKey" value="supersecretapikey123" required>
-                        <small>Default test API Key</small>
-                    </div>
-                    
-                    <button type="submit" class="btn-primary" id="predictBtn">Make Prediction</button>
-                </form>
-                
-                <div id="resultBox" class="result-box hidden">
-                    <h3>Prediction Result:</h3>
-                    <div id="predictionName" class="highlight"></div>
-                    <p class="subtitle">Class Label: <span id="predictionClass"></span></p>
-                </div>
-            </section>
-
-            <section class="card charts-section glass-panel">
-                <h2>Prediction History</h2>
-                <div class="chart-container">
-                    <canvas id="predictionChart"></canvas>
-                </div>
-                
-                <div class="table-container">
-                    <table id="historyTable">
-                        <thead>
-                            <tr>
-                                <th>#</th>
-                                <th>Features</th>
-                                <th>Prediction</th>
-                                <th>Time</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <!-- Rows added dynamically -->
-                        </tbody>
-                    </table>
-                </div>
-            </section>
-        </main>
-    </div>
-    <script src="js/app.js?v=2"></script>
+    <script src="js/app.js?v=3"></script>
+    <footer style="text-align: center; margin-top: 2rem; color: #64748b; font-size: 0.8rem;">
+        App Version: 3.0 (Strict Validation Active)
+    </footer>
 </body>
 </html>

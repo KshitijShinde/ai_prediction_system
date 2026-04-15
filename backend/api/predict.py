@@ -29,6 +29,10 @@ async def predict(request: PredictionRequest):
         raise HTTPException(status_code=500, detail="Model is not loaded.")
     
     try:
+        # Fail-safe check: Reject all-zero inputs even if validator was bypassed
+        if all(v == 0 for v in request.features):
+            raise HTTPException(status_code=400, detail="Invalid input: All measurements are zero. Please enter valid flower data.")
+
         # Request features as list for sklearn
         input_data = [request.features]
         pred = model.predict(input_data)[0]
