@@ -70,6 +70,26 @@ document.addEventListener('DOMContentLoaded', () => {
             parseFloat(document.getElementById('petalLength').value),
             parseFloat(document.getElementById('petalWidth').value)
         ];
+
+        // Client-side validation: reject zero/invalid measurements
+        if (features.every(v => v === 0)) {
+            alert('All feature values are zero. Please enter valid iris measurements.');
+            btn.textContent = "Make Prediction";
+            btn.disabled = false;
+            return;
+        }
+        if (features[0] <= 0 || features[2] <= 0) {
+            alert('Sepal Length and Petal Length must be greater than 0.');
+            btn.textContent = "Make Prediction";
+            btn.disabled = false;
+            return;
+        }
+        if (features.some(v => v < 0)) {
+            alert('Feature values cannot be negative.');
+            btn.textContent = "Make Prediction";
+            btn.disabled = false;
+            return;
+        }
         
         const apiKey = document.getElementById('apiKey').value;
 
